@@ -133,7 +133,7 @@ export default {
    data() {
       return {
          obj: {
-            price: 3300000,
+            price: 330000,
             initial: 13,
             months: 1,
             value: 0,
@@ -173,15 +173,15 @@ export default {
 
 $green-color: #53b374;
 
+.switch input {
+   display:none;
+}
+
 .switch {
    display: inline-block;
    height: 26px;
    position: relative;
    width: 60px;
-}
-
-.switch input {
-   display:none;
 }
 
 .slider {
