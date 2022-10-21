@@ -38,6 +38,7 @@
                            </div>
                         </div>
                      </div>
+
                      <div class="range col-12">
                         <div class="range__title">
                            Стоимость недвижимости
@@ -52,12 +53,13 @@
                            </div>
                            <input class="range__inner-input"
                                   type="range"
-                                  min="1000000"
-                                  max="6000000"
+                                  min="0"
+                                  max="100000"
                                   v-model="obj.price"
                            >
                         </div>
                      </div>
+
                      <div class="range col-12">
                         <div class="range__title">
                            Первоначальный взнос
@@ -66,14 +68,14 @@
                            <div class="range__inner-top">
                               <input type="text"
                                      class="range__inner-text"
-                                     v-model.trim.number="initialPrice"
+                                     v-model.trim.number="obj.initial"
                               >
                               <span class="range__inner-icon">₽</span>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
-                                  min="10"
-                                  max="60"
+                                  min="0"
+                                  max="99000"
                                   v-model="obj.initial"
                            >
                         </div>
@@ -93,7 +95,7 @@
                            <input class="range__inner-input"
                                   type="range"
                                   min="1"
-                                  max="60"
+                                  max="12"
                                   v-model="obj.months"
                            >
                         </div>
@@ -104,15 +106,15 @@
                   <div class="row">
                      <div class="info col-lg-6">
                         <span class="info__title">Сумма кредита</span>
-                        <span class="info__price">{{ allPrice }} ₽</span>
+                        <span class="info__price">{{  }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
                         <span class="info__title">Ежемесячный платеж</span>
-                        <span class="info__price">{{ getMonthPay }} ₽</span>
+                        <span class="info__price">{{  }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
                         <span class="info__title">Процентная ставка</span>
-                        <span class="info__price">{{ getMonthPay }} %</span>
+                        <span class="info__price">{{  }} %</span>
                      </div>
                      <div class="info col-12">
                         <button class="info__button info__button--light">График платежей</button>
@@ -123,16 +125,6 @@
                   </div>
                </div>
             </div>
-            <!--            <pre>-->
-            <!--                  {{ obj.price }}-->
-            <!--                  {{ obj.initial }}-->
-            <!--                  {{ obj.months }}-->
-            <!--                  (Стоимость автомобиля - Первоначальный взнос) * ((Процентная ставка *-->
-            <!--                  (1 + Процентная ставка)^Срок кредита в месяцах) / ((1 + Процентная ставка)^Срок кредита в месяцах - 1))-->
-
-            <!--                  const monthPay = (price - initial) * ((0.035 * Math.pow((1 + 0.035), months)) /-->
-            <!--                  (Math.pow((1 + 0.035), months) - 1));-->
-            <!--               </pre>-->
          </div>
 
       </div>
@@ -150,14 +142,15 @@ export default {
    data() {
       return {
          obj: {
-            price: 330000,
-            initial: 13,
+            price: 0,
+            initial: 0,
             months: 1,
             value: 0,
          },
          options: [
-            {name: 'option 1', value: 1},
-            {name: 'option 2', value: 2},
+            {name: 'Квартира в новостройке', procent: 5.7, value: 1},
+            {name: 'Квартира на вторичном рынке', procent: 10.4, value: 2},
+            {name: 'Купить дом', procent: 4.4, value: 3},
          ],
          optionName: '112',
          checked: false,
@@ -165,28 +158,13 @@ export default {
       };
    },
    methods: {
-      optionSelected(option) {
-         this.optionName = option.name;
-      },
       selectChange(value) {
          console.log('123',value.name);
          this.selected = value
       }
    },
    computed: {
-      getMonthPay() {
-         console.log((this.obj.price - this.initialPrice));
-         let sumMonth = (this.obj.price - this.obj.initial) * ((0.035 * Math.pow((1 + 0.035), this.obj.months)) /
-             (Math.pow((1 + 0.035), this.obj.months) - 1));
-         sumMonth = Math.floor(sumMonth);
-         return sumMonth;
-      },
-      initialPrice() {
-         return Math.floor(this.obj.price * this.obj.initial / 100);
-      },
-      allPrice() {
-         return this.initialPrice + this.obj.months * this.getMonthPay;
-      },
+
    },
 };
 </script>

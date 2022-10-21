@@ -10,7 +10,7 @@
           :class="{open: open}"
           @click="open = !open"
       >
-         {{ selected.name }}
+         <div class="selected__title"> {{ selected.name }}</div>
       </div>
       <div
           class="items"
@@ -22,7 +22,8 @@
              :key="i"
              @click="selected=option; open=false; $emit('option', option)"
          >
-            {{ option.name }}
+            <div class="item__title"> {{ option.name }}</div>
+            <div class="item__procent"> {{ option.procent }}</div>
          </div>
       </div>
    </div>
@@ -49,13 +50,12 @@ export default {
    },
    mounted() {
       this.$emit('option', this.selected);
-      console.log(this.selected.name);
    },
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .selected {
-   height: 50px;
+   min-height: 50px;
 }
 .custom-select {
    position: relative;
@@ -102,7 +102,6 @@ export default {
    width: 0;
    height: 0;
 }
-
 .items {
    border-radius: 0px 0px 6px 6px;
    overflow: hidden;
@@ -114,16 +113,34 @@ export default {
    left: 0;
    right: 0;
    z-index: 10;
+   min-height: 100px;
+   max-height: 100px;
+   overflow-y: scroll;
 }
 .item {
-   padding-left: 10px;
+   padding: 0 10px;
    cursor: pointer;
    user-select: none;
-}
-.item:hover {
-   background-color: #53b374;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   scrollbar-color: #53b374 #fff;
+   scrollbar-width: thin;
+
+   &__procent {
+      color: #53B374FF;
+      font-weight: 500;
+   }
+   &:hover {
+      background-color: #53b374;
+      color: #fff;
+      & .item__procent {
+         color: #fff;
+      }
+   }
 }
 .selectHide {
    display: none;
 }
+
 </style>
