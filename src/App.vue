@@ -97,6 +97,7 @@
                                   min="1"
                                   max="12"
                                   v-model="obj.months"
+                                  @input="checkInput"
                            >
                         </div>
                      </div>
@@ -161,6 +162,12 @@ export default {
       selectChange(value) {
          console.log('123',value.name);
          this.selected = value
+      },
+      checkInput() {
+         if(this.obj.months ===  null || this.obj.months === '') {
+            this.obj.months = 0
+            console.log(this.obj.months);
+         }
       }
    },
    computed: {
