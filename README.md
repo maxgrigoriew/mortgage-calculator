@@ -1,4 +1,4 @@
-# oxen-app
+# mortgage-calculator
 
 ## Project setup
 ```
