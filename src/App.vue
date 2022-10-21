@@ -8,25 +8,22 @@
             <div class="row wrapper__inner">
                <div class="col-md-6">
                   <div class="row">
-                     <div class="col-12">
+                     <div class="select col-12">
                         <div class="info__title">Выберите 1 из 5 ипотечных программ для расчета</div>
-                        <is-select :options="options"
-                                   :option-name="optionName"
-                                   @optionSelected="optionSelected"
-                        />
+                        <is-select :options="options"/>
                      </div>
-                     <div class="col-12">
-                        <div class="info__inner">
-                           <span class="info__title">Есть зарплатная карта</span>
+                     <div class="checkbox col-12">
+                        <div class="checkbox__inner">
+                           <span class="checkbox__title">Есть зарплатная карта</span>
                            <label class="switch" for="checkbox">
-                              <input type="checkbox" id="checkbox" />
+                              <input type="checkbox" id="checkbox"/>
                               <div class="slider round"></div>
                            </label>
                         </div>
                      </div>
                      <div class="range col-12">
                         <div class="range__title">
-                           Стоимость автомобиля
+                           Стоимость недвижимости
                         </div>
                         <div class="range__inner">
                            <div class="range__inner-top">
@@ -34,7 +31,7 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.price"
                               >
-                              <div class="range__inner-info">₽</div>
+                              <div class="range__inner-icon">₽</div>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -54,8 +51,7 @@
                                      class="range__inner-text"
                                      v-model.trim.number="initialPrice"
                               >
-                              <span>₽</span>
-                              <div class="range__inner-info range__inner-info--procent">{{ obj.initial }} %</div>
+                              <span class="range__inner-icon">₽</span>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -67,7 +63,7 @@
                      </div>
                      <div class="range col-12">
                         <div class="range__title">
-                           Срок лизинга
+                           Срок ипотеки
                         </div>
                         <div class="range__inner">
                            <div class="range__inner-top">
@@ -75,7 +71,7 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.months"
                               >
-                              <div class="range__inner-info">мес.</div>
+                              <div class="range__inner-icon">мес.</div>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -90,45 +86,49 @@
                <div class="col-md-6">
                   <div class="row">
                      <div class="info col-lg-6">
-                        <span class="info__title">Сумма договора лизинга</span>
+                        <span class="info__title">Сумма кредита</span>
                         <span class="info__price">{{ allPrice }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
-                        <span class="info__title">Ежемесячный платеж от</span>
+                        <span class="info__title">Ежемесячный платеж</span>
                         <span class="info__price">{{ getMonthPay }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
-                        <span class="info__title">Ежемесячный платеж от</span>
-                        <span class="info__price">{{ getMonthPay }} ₽</span>
+                        <span class="info__title">Процентная ставка</span>
+                        <span class="info__price">{{ getMonthPay }} %</span>
                      </div>
-                  </div>
-                  <div class="info col-lg-6">
-                     <button class="info__button">Оставить заявку</button>
+                     <div class="info col-12">
+                        <button class="info__button info__button--light">График платежей</button>
+                     </div>
+                     <div class="info col-12">
+                        <button class="info__button">Оставить заявку</button>
+                     </div>
                   </div>
                </div>
             </div>
-<!--            <pre>-->
-<!--                  {{ obj.price }}-->
-<!--                  {{ obj.initial }}-->
-<!--                  {{ obj.months }}-->
-<!--                  (Стоимость автомобиля - Первоначальный взнос) * ((Процентная ставка *-->
-<!--                  (1 + Процентная ставка)^Срок кредита в месяцах) / ((1 + Процентная ставка)^Срок кредита в месяцах - 1))-->
+            <!--            <pre>-->
+            <!--                  {{ obj.price }}-->
+            <!--                  {{ obj.initial }}-->
+            <!--                  {{ obj.months }}-->
+            <!--                  (Стоимость автомобиля - Первоначальный взнос) * ((Процентная ставка *-->
+            <!--                  (1 + Процентная ставка)^Срок кредита в месяцах) / ((1 + Процентная ставка)^Срок кредита в месяцах - 1))-->
 
-<!--                  const monthPay = (price - initial) * ((0.035 * Math.pow((1 + 0.035), months)) /-->
-<!--                  (Math.pow((1 + 0.035), months) - 1));-->
-<!--               </pre>-->
+            <!--                  const monthPay = (price - initial) * ((0.035 * Math.pow((1 + 0.035), months)) /-->
+            <!--                  (Math.pow((1 + 0.035), months) - 1));-->
+            <!--               </pre>-->
          </div>
-      
+
       </div>
    </div>
 </template>
 
 <script>
-import isSelect from "@/components/isSelect";
+import isSelect from '@/components/isSelect';
+
 export default {
    name: 'App',
    components: {
-      isSelect
+      isSelect,
    },
    data() {
       return {
@@ -142,48 +142,45 @@ export default {
             {name: 'option 1', value: 1},
             {name: 'option 2', value: 2},
          ],
-         optionName: '112'
-      }
+         optionName: '112',
+      };
    },
    methods: {
       optionSelected(option) {
-         this.optionName = option.name
-      }
+         this.optionName = option.name;
+      },
    },
    computed: {
       getMonthPay() {
-         console.log((this.obj.price - this.initialPrice))
+         console.log((this.obj.price - this.initialPrice));
          let sumMonth = (this.obj.price - this.obj.initial) * ((0.035 * Math.pow((1 + 0.035), this.obj.months)) /
              (Math.pow((1 + 0.035), this.obj.months) - 1));
-         sumMonth = Math.floor(sumMonth)
-         return sumMonth
+         sumMonth = Math.floor(sumMonth);
+         return sumMonth;
       },
       initialPrice() {
-         return Math.floor(this.obj.price * this.obj.initial / 100)
+         return Math.floor(this.obj.price * this.obj.initial / 100);
       },
       allPrice() {
-         return this.initialPrice + this.obj.months * this.getMonthPay
-      }
-      
-   }
-}
+         return this.initialPrice + this.obj.months * this.getMonthPay;
+      },
+
+   },
+};
 </script>
 
 <style lang="scss">
 
 $green-color: #53b374;
-
 .switch input {
-   display:none;
+   display: none;
 }
-
 .switch {
    display: inline-block;
    height: 26px;
    position: relative;
    width: 60px;
 }
-
 .slider {
    bottom: 0;
    cursor: pointer;
@@ -194,7 +191,6 @@ $green-color: #53b374;
    transition: .4s;
    border: 1px solid $green-color;
 }
-
 .slider:before {
    background-color: #53b374;
    bottom: 3px;
@@ -205,20 +201,16 @@ $green-color: #53b374;
    position: absolute;
    transition: .4s;
 }
-
 input:checked + .slider {
    background-color: #53b374;
 }
-
 input:checked + .slider:before {
-   transform: translateX(34px);
+   transform: translateX(33px);
    background: #fff;
 }
-
 .slider.round {
    border-radius: 34px;
 }
-
 .slider.round:before {
    border-radius: 50%;
 }
