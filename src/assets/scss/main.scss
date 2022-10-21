@@ -57,7 +57,7 @@ body {
 	position: relative;
   }
   &__inner-text {
-	padding-right: 16px;
+	padding: 0 20px 0 10px;
 	background: transparent;
 	box-sizing: border-box;
 	width: 100%;
@@ -66,7 +66,7 @@ body {
 	color: #575757;
   }
   &__inner-text:focus {
-	  outline: none;
+	outline: none;
 	border: 2px solid $green-color;
 	border-bottom-color: transparent;
   }
@@ -82,13 +82,13 @@ body {
   &__inner-input {
 	box-sizing: border-box;
 	width: 100%;
-	height: 50px;
+	height: 20px;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 	background: transparent;
 	position: absolute;
-	bottom: 7px;
+	bottom: 22px;
   }
   &__inner-input::-webkit-slider-runnable-track {
 	border-radius: 5px;
@@ -161,5 +161,15 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+  }
+  &__wrapper {
+	display: flex;
+	align-items: center;
+  }
+  &__procent {
+	margin-right: 20px;
+  }
+  &__procent.active {
+	color: $green-color;
   }
 }

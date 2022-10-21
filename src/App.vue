@@ -10,15 +10,32 @@
                   <div class="row">
                      <div class="select col-12">
                         <div class="info__title">Выберите 1 из 5 ипотечных программ для расчета</div>
-                        <is-select :options="options"/>
+                        <is-select :options="options"
+                                   :selected="selected"
+                                   @option="selectChange"
+                        />
                      </div>
                      <div class="checkbox col-12">
                         <div class="checkbox__inner">
                            <span class="checkbox__title">Есть зарплатная карта</span>
-                           <label class="switch" for="checkbox">
-                              <input type="checkbox" id="checkbox"/>
-                              <div class="slider round"></div>
-                           </label>
+                           <div class="checkbox__wrapper">
+                              <span class="checkbox__procent"
+                                    :class="{active: checked}"
+                              >
+                                 -1%
+                              </span>
+                              <label class="switch" for="checkbox">
+                                 <input type="checkbox"
+                                        v-model="checked"
+                                        value="test"
+                                 />
+                                 <div class="slider round"
+                                      @click="checked = !checked"
+                                 >
+
+                                 </div>
+                              </label>
+                           </div>
                         </div>
                      </div>
                      <div class="range col-12">
@@ -143,12 +160,18 @@ export default {
             {name: 'option 2', value: 2},
          ],
          optionName: '112',
+         checked: false,
+         selected: 'df'
       };
    },
    methods: {
       optionSelected(option) {
          this.optionName = option.name;
       },
+      selectChange(value) {
+         console.log('123',value.name);
+         this.selected = value
+      }
    },
    computed: {
       getMonthPay() {
@@ -164,7 +187,6 @@ export default {
       allPrice() {
          return this.initialPrice + this.obj.months * this.getMonthPay;
       },
-
    },
 };
 </script>

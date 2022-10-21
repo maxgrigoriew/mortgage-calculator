@@ -10,7 +10,7 @@
           :class="{open: open}"
           @click="open = !open"
       >
-         {{ selected }}
+         {{ selected.name }}
       </div>
       <div
           class="items"
@@ -20,7 +20,7 @@
              class="item"
              v-for="(option, i) of options"
              :key="i"
-             @click="selected=option; open=false; $emit('input', option)"
+             @click="selected=option; open=false; $emit('option', option)"
          >
             {{ option.name }}
          </div>
@@ -43,17 +43,20 @@ export default {
    },
    data() {
       return {
-         selected: this.options.length > 0 ? this.options[0].name : null,
+         selected: this.options.length > 0 ? this.options[0] : null,
          open: false,
       };
    },
    mounted() {
-      this.$emit('input', this.selected);
+      this.$emit('option', this.selected);
+      console.log(this.selected.name);
    },
 };
 </script>
 <style scoped>
-
+.selected {
+   height: 50px;
+}
 .custom-select {
    position: relative;
    width: 100%;
