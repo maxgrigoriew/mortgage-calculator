@@ -114,7 +114,7 @@ export default {
    right: 0;
    z-index: 10;
    min-height: 100px;
-   max-height: 100px;
+   max-height: 250px;
    overflow-y: scroll;
 }
 .item {
