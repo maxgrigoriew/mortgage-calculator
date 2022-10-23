@@ -2,13 +2,13 @@
    <tr
        class="p-2">
       <td class="table-striped">
-         {{ post.id }}
+         {{ item.monthlyPayment }}
       </td>
       <td class="table-striped">
-         {{ post.title }}
+         {{ item.title }}
       </td>
       <td class="table-secondary">
-         {{ post.body }}
+         {{ item.body }}
       </td>
       <td class="table-secondary text-right">
       </td>
@@ -21,7 +21,7 @@
 export default {
    name: "isTableItem",
    components: {},
-   props: ['post'],
+   props: ['item'],
 }
 </script>
 

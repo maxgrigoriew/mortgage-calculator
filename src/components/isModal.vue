@@ -9,7 +9,7 @@
                <button class="dialog__btn">x</button>
             </div>
             <div class="dialog__content">
-            <is-table-header/>
+            <is-table-header :resultTableArray="resultTableArray"/>
             </div>
             <slot></slot>
          </div>
@@ -26,6 +26,9 @@ export default {
       visibleModal: {
          type: Boolean,
          default: false
+      },
+      resultTableArray: {
+         type: Array
       }
    },
    methods: {
@@ -38,16 +41,16 @@ export default {
 
 <style lang="scss" scoped>
 .dialog {
-   position: fixed;
-   left: 0;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   background: rgba(0, 0, 0, 0.5);
-   display: flex;
-   justify-content: center;
-   align-items: center;
-   z-index: 100;
+   //position: fixed;
+   //left: 0;
+   //top: 0;
+   //right: 0;
+   //bottom: 0;
+   //background: rgba(0, 0, 0, 0.5);
+   //display: flex;
+   //justify-content: center;
+   //align-items: center;
+   //z-index: 100;
    &__inner {
       max-width: 600px;
       width: 100%;

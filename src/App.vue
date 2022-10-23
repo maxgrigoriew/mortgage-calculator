@@ -106,11 +106,11 @@
                   <div class="row">
                      <div class="info col-lg-6">
                         <span class="info__title">Сумма кредита</span>
-                        <span class="info__price">{{  }} ₽</span>
+                        <span class="info__price">{{ getLounAmount }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
                         <span class="info__title">Ежемесячный платеж</span>
-                        <span class="info__price">{{ getMonthlyPayment }} ₽</span>
+                        <span class="info__price">{{ monthlyPayment }} ₽</span>
                      </div>
                      <div class="info col-lg-6">
                         <span class="info__title">Процентная ставка</span>
@@ -123,8 +123,8 @@
                      
                      <div class="info col-12">
                         <button class="info__button info__button--light"
-                                @click="openModal"
-                        >График платежей</button>
+                        >График платежей
+                        </button>
                      </div>
                      <div class="info col-12">
                         <button class="info__button">Оставить заявку</button>
@@ -134,33 +134,47 @@
             </div>
          </div>
       </div>
-      <is-modal :visibleModal="visibleModal"
-                @visibleModal="closeModal"
-      />
+      <table>
+         <thead>
+         <tr>
+            <th>Месяц, год</th>
+            <th>Ежемесячный платеж</th>
+            <th>Сумма погашения процентов</th>
+            <th>Сумма погашения сновного долга</th>
+            <th>Остаток долга</th>
+         </tr>
+         </thead>
+         <tbody class="tableBody">
+         </tbody>
+      </table>
+<!--      <is-modal :visibleModal="visibleModal"-->
+<!--                @visibleModal="closeModal"-->
+<!--                :resultTableArray="resultTableArray"-->
+<!--      />-->
    </div>
 </template>
 
 <script>
 import isSelect from '@/components/isSelect';
-import isModal from '@/components/isModal';
+// import isModal from '@/components/isModal';
 
 export default {
    name: 'App',
    components: {
       isSelect,
-      isModal
+      // isModal
    },
    data() {
       return {
          obj: {
-            price: 1000000,
-            initial: 400000,
+            price: 3000000,
+            initial: 0,
             years: 1,
             value: 0,
             procentCard: 1
          },
          options: [
-            {name: 'Квартира на вторичном рынке', procent: 10.4, value: 2},
+            {name: 'Квартира на вторичном рынке', procent: 10, value: 2},
             {name: 'Квартира в новостройке', procent: 9.9, value: 1},
             {name: 'Купить дом', procent: 4.4, value: 3},
             {name: 'Построить дом', procent: 5.3, value: 4},
@@ -169,8 +183,8 @@ export default {
          ],
          checked: false,
          selected: '',
-         visibleModal: true
-         
+         visibleModal: true,
+         resultTableArray: []
       };
    },
    methods: {
@@ -182,6 +196,66 @@ export default {
       },
       closeModal() {
          this.visibleModal = false
+      },
+      getPayments(months, loanAmount, annualIntersetRate) {
+         // Заведём переменную "месечная процентная ставка"
+         // она будет равна "годовая процентной ставке" (annualIntersetRate)
+         // поделённой на кол-ву месяцев в году (12)
+         // Например, если годовая ставка будет равна 10%,
+         // то месечная ставка = 10/12/100 = 0.0083%
+         const monthlyRate = annualIntersetRate / 12 / 100;
+         const commonRate = Math.pow(1 + monthlyRate, months);
+         const monthlyPayment =(loanAmount * monthlyRate * commonRate) / (commonRate - 1);
+         // Складируем все данные по месяцам сюда
+         const result = [];
+         
+         for (let i = 0; i < months; i++) {
+            // Переменная "totalRemain" будет отвечать за сумму,
+            // которую осталось выплатить.
+            // Изначально он будет равен сумме кредита.
+            const {totalRemain = loanAmount} = result[result.length - 1] || {};
+            const paymentInterest = monthlyRate * totalRemain;
+            const paymentRemain = monthlyPayment - paymentInterest;
+            
+            result.push({
+               totalRemain: Math.max(totalRemain - paymentRemain, 0),
+               monthlyPayment,
+               paymentInterest,
+               paymentRemain,
+               months
+            });
+         }
+         this.resultTableArray = result
+         return result;
+      },
+      createTableRow({
+                        totalRemain,
+                        monthlyPayment,
+                        paymentInterest,
+                        paymentRemain,
+                        months,
+                     }) {
+         const tbodyEl = document.querySelector(".tableBody");
+         const rowElement = document.createElement("tr");
+         const tdMonthlyPaymentElement = document.createElement("td");
+         const tdMonthlyName = document.createElement("td");
+         const tdInterestPaymentElement = document.createElement("td");
+         const tdRemainPaymentElement = document.createElement("td");
+         const tdTotalPaymentElement = document.createElement("td");
+         
+         tdMonthlyPaymentElement.innerText = `${monthlyPayment.toFixed(2)}`;
+         tdInterestPaymentElement.innerText = `${paymentInterest.toFixed(2)}`;
+         tdRemainPaymentElement.innerText = `${paymentRemain.toFixed(2)}`;
+         tdTotalPaymentElement.innerText = `${totalRemain.toFixed(2)}`;
+         tdMonthlyName.innerText = `${months.toFixed(2)}`;
+         
+         rowElement.appendChild(tdMonthlyName);
+         rowElement.appendChild(tdMonthlyPaymentElement);
+         rowElement.appendChild(tdInterestPaymentElement);
+         rowElement.appendChild(tdRemainPaymentElement);
+         rowElement.appendChild(tdTotalPaymentElement);
+         
+         tbodyEl.appendChild(rowElement);
       }
    },
    computed: {
@@ -192,8 +266,8 @@ export default {
             return this.selected.procent
          }
       },
-      getProcentMonth() {
-         return this.getProcent / 12
+      monthlyRate() {
+         return this.getProcent / 100 / 12
       },
       getLounAmount() {
          return this.obj.price - this.obj.initial
@@ -201,9 +275,12 @@ export default {
       getMonth() {
          return this.obj.years * 12
       },
-      getMonthlyPayment() {
-         let monthlyPayment = (this.getLounAmount + (((this.getLounAmount / 100) * this.getProcent) / 12) * this.getMonth) / this.getMonth
-         let monthlyAroundPayment = Math.floor(monthlyPayment)
+      commonRate() {
+         return Math.pow(1 + this.monthlyRate, this.getMonth)
+      },
+      monthlyPayment() {
+         let monthlyPay  = (this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1)
+         let monthlyAroundPayment = Math.floor(monthlyPay )
          if (monthlyAroundPayment < 0) {
             return false
          }
@@ -211,13 +288,19 @@ export default {
       },
       getSelectedProcent() {
          return this.obj.procentCard
-      },
+      }
+      ,
       recomendetIncome() {
-         return (this.getMonthlyPayment /100 * 35) + this.getMonthlyPayment
+         return (this.monthlyPayment / 100 * 35) + this.monthlyPayment
       }
    },
-   watch: {}
-};
+   watch: {},
+   mounted() {
+      this.getPayments(this.getMonth, this.getLounAmount, this.getProcent).forEach((data) => this.createTableRow(data));
+      console.log(this.resultTableArray)
+   }
+}
+;
 </script>
 
 <style lang="scss">

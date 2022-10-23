@@ -8,9 +8,9 @@
          <th>Основной долг</th>
          <th>Остаток долга</th>
       </tr>
-      <is-table-item v-for="post in posts"
-                       :key="post.id"
-                       :post="post"/>
+      <is-table-item v-for="item in resultTableArray"
+                       :key="item.id"
+                       :post="item"/>
    </table>
    <div v-else> Таблица пуста
    </div>
@@ -21,15 +21,10 @@ import isTableItem from "@/components/isTableItem";
 
 export default {
    name: "isTableHeader",
+   props: ['resultTableArray'],
    data() {
       return {
-         posts: [
-            {
-               id: 1,
-               title: 'title',
-               body: 'body'
-            }
-         ]
+      
       }
    },
    components: {
