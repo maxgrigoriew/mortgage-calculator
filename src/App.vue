@@ -124,6 +124,7 @@
 
                      <div class="info col-12">
                         <button class="info__button info__button--light"
+                                @click="openModal"
                         >График платежей
                         </button>
                      </div>
@@ -168,13 +169,13 @@
 
 <script>
 import isSelect from '@/components/isSelect';
-// import isModal from '@/components/isModal';
+import isModal from '@/components/isModal';
 
 export default {
    name: 'App',
    components: {
       isSelect,
-      // isModal
+      isModal
    },
    data() {
       return {

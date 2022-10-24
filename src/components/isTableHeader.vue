@@ -1,36 +1,39 @@
 <template>
-   <table v-if="true"
-          class="w-100">
-      <tr class="table-warning card-title mt-4">
-         <th>Месяц</th>
-         <th>Платеж</th>
-         <th>Проценты</th>
-         <th>Основной долг</th>
+   <table>
+      <thead>
+      <tr>
+         <th>Месяц, год</th>
+         <th>Ежемесячный платеж</th>
+         <th>Сумма погашения процентов</th>
+         <th>Сумма погашения сновного долга</th>
          <th>Остаток долга</th>
       </tr>
-      <is-table-item v-for="item in resultTableArray"
-                       :key="item.id"
-                       :post="item"/>
+      </thead>
+      <tbody class="tableBody">
+      <tr v-for="(pay, index) in resultTableArray"
+          :key="index"
+          :pay="pay">
+         <td>{{ pay.currMonth }}</td>
+         <td>{{ pay.monthlyPayment }} руб.</td>
+         <td>{{ pay.paymentInterest }} руб.</td>
+         <td>{{ pay.paymentRemain }} руб.</td>
+         <td>{{ pay.totalRemain }} руб.</td>
+      </tr>
+      </tbody>
    </table>
-   <div v-else> Таблица пуста
-   </div>
 </template>
 
 <script>
-import isTableItem from "@/components/isTableItem";
 
 export default {
-   name: "isTableHeader",
+   name: 'isTableHeader',
    props: ['resultTableArray'],
-   data() {
-      return {
-      
-      }
-   },
    components: {
-      isTableItem
    },
-}
+   data() {
+      return {};
+   },
+};
 </script>
 
 <style scoped>
