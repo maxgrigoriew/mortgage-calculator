@@ -3,7 +3,7 @@
       <div class="wrapper">
          <div class="container">
             <h1 class="title col-md-6">
-               Ипотечный калькулятор
+               Калькулятор ипотеки для IT-специалистов
             </h1>
             <div class="row wrapper__inner">
                <div class="col-md-6">
@@ -32,13 +32,13 @@
                                  <div class="slider round"
                                       @click="checked = !checked"
                                  >
-                                 
+
                                  </div>
                               </label>
                            </div>
                         </div>
                      </div>
-                     
+
                      <div class="range col-12">
                         <div class="range__title">
                            Стоимость недвижимости
@@ -53,16 +53,17 @@
                            </div>
                            <input class="range__inner-input"
                                   type="range"
-                                  min="0"
-                                  max="1000000"
+                                  :min="obj.minPrice"
+                                  :max="obj.maxPrice"
                                   v-model="obj.price"
                            >
                         </div>
                      </div>
-                     
+
                      <div class="range col-12">
-                        <div class="range__title">
-                           Первоначальный взнос
+                        <div class="range__title" style="font-weight: 900;">
+                           Первоначальный взнос <br>
+                           <span style="font-size: 10px;">Первоначальный взнос должен быть не более 90% от стоимости недвижимости</span>
                         </div>
                         <div class="range__inner">
                            <div class="range__inner-top">
@@ -74,8 +75,8 @@
                            </div>
                            <input class="range__inner-input"
                                   type="range"
-                                  min="0"
-                                  max="99000"
+                                  :min="obj.price * 0.15"
+                                  :max="obj.price * 0.9"
                                   v-model="obj.initial"
                            >
                         </div>
@@ -96,7 +97,7 @@
                                   type="range"
                                   min="1"
                                   max="30"
-                                  v-model="obj.years"
+                                  v-model.trim.number="obj.years"
                            >
                         </div>
                      </div>
@@ -120,7 +121,7 @@
                         <span class="info__title">Рекомендованный доход</span>
                         <span class="info__price">{{ recomendetIncome }} ₽</span>
                      </div>
-                     
+
                      <div class="info col-12">
                         <button class="info__button info__button--light"
                         >График платежей
@@ -145,12 +146,23 @@
          </tr>
          </thead>
          <tbody class="tableBody">
+         <template v-if="resultTableArray.length > 0">
+            <tr v-for="(pay, index) in resultTableArray"
+                :key="index"
+            >
+               <td>{{ pay.currMonth }}</td>
+               <td>{{ pay.monthlyPayment }} руб.</td>
+               <td>{{ pay.paymentInterest }} руб.</td>
+               <td>{{ pay.paymentRemain }} руб.</td>
+               <td>{{ pay.totalRemain }} руб.</td>
+            </tr>
+         </template>
          </tbody>
       </table>
-<!--      <is-modal :visibleModal="visibleModal"-->
-<!--                @visibleModal="closeModal"-->
-<!--                :resultTableArray="resultTableArray"-->
-<!--      />-->
+      <!--      <is-modal :visibleModal="visibleModal"-->
+      <!--                @visibleModal="closeModal"-->
+      <!--                :resultTableArray="resultTableArray"-->
+      <!--      />-->
    </div>
 </template>
 
@@ -166,12 +178,15 @@ export default {
    },
    data() {
       return {
+         years: 1,
          obj: {
-            price: 3000000,
-            initial: 0,
+            price: 200000,
+            initial: null,
             years: 1,
             value: 0,
-            procentCard: 1
+            procentCard: 1,
+            maxPrice: 6000000,
+            minPrice: 200000
          },
          options: [
             {name: 'Квартира на вторичном рынке', procent: 10, value: 2},
@@ -203,60 +218,35 @@ export default {
          // поделённой на кол-ву месяцев в году (12)
          // Например, если годовая ставка будет равна 10%,
          // то месечная ставка = 10/12/100 = 0.0083%
-         const monthlyRate = annualIntersetRate / 12 / 100;
-         const commonRate = Math.pow(1 + monthlyRate, months);
-         const monthlyPayment =(loanAmount * monthlyRate * commonRate) / (commonRate - 1);
+         const monthlyRate = annualIntersetRate / 12 / 100
+         const commonRate = Math.pow(1 + monthlyRate, months)
+         const monthlyPayment = ((loanAmount * monthlyRate * commonRate) / (commonRate - 1)).toFixed(2)
          // Складируем все данные по месяцам сюда
-         const result = [];
-         
+         const result = []
+         const today = new Date(Date.now())
          for (let i = 0; i < months; i++) {
             // Переменная "totalRemain" будет отвечать за сумму,
             // которую осталось выплатить.
             // Изначально он будет равен сумме кредита.
-            const {totalRemain = loanAmount} = result[result.length - 1] || {};
-            const paymentInterest = monthlyRate * totalRemain;
-            const paymentRemain = monthlyPayment - paymentInterest;
-            
+            const {totalRemain = loanAmount} = result[result.length - 1] || {}
+            const newDate = new Date(today.setMonth(today.getMonth() + 1))
+            const paymentInterest = (monthlyRate * totalRemain).toFixed(2)
+            const paymentRemain = (monthlyPayment - paymentInterest).toFixed(2)
+            const currMonth = newDate.toLocaleString('ru', {
+               year: 'numeric',
+               month: 'short'
+            })
             result.push({
-               totalRemain: Math.max(totalRemain - paymentRemain, 0),
+               totalRemain: (Math.max(totalRemain - paymentRemain, 0)).toFixed(2),
                monthlyPayment,
                paymentInterest,
                paymentRemain,
-               months
+               currMonth
             });
          }
          this.resultTableArray = result
          return result;
       },
-      createTableRow({
-                        totalRemain,
-                        monthlyPayment,
-                        paymentInterest,
-                        paymentRemain,
-                        months,
-                     }) {
-         const tbodyEl = document.querySelector(".tableBody");
-         const rowElement = document.createElement("tr");
-         const tdMonthlyPaymentElement = document.createElement("td");
-         const tdMonthlyName = document.createElement("td");
-         const tdInterestPaymentElement = document.createElement("td");
-         const tdRemainPaymentElement = document.createElement("td");
-         const tdTotalPaymentElement = document.createElement("td");
-         
-         tdMonthlyPaymentElement.innerText = `${monthlyPayment.toFixed(2)}`;
-         tdInterestPaymentElement.innerText = `${paymentInterest.toFixed(2)}`;
-         tdRemainPaymentElement.innerText = `${paymentRemain.toFixed(2)}`;
-         tdTotalPaymentElement.innerText = `${totalRemain.toFixed(2)}`;
-         tdMonthlyName.innerText = `${months.toFixed(2)}`;
-         
-         rowElement.appendChild(tdMonthlyName);
-         rowElement.appendChild(tdMonthlyPaymentElement);
-         rowElement.appendChild(tdInterestPaymentElement);
-         rowElement.appendChild(tdRemainPaymentElement);
-         rowElement.appendChild(tdTotalPaymentElement);
-         
-         tbodyEl.appendChild(rowElement);
-      }
    },
    computed: {
       getProcent() {
@@ -271,6 +261,9 @@ export default {
       },
       getLounAmount() {
          return this.obj.price - this.obj.initial
+      },
+      getInitial() {
+         return this.obj.initial
       },
       getMonth() {
          return this.obj.years * 12
@@ -288,16 +281,35 @@ export default {
       },
       getSelectedProcent() {
          return this.obj.procentCard
-      }
-      ,
+      },
       recomendetIncome() {
          return (this.monthlyPayment / 100 * 35) + this.monthlyPayment
+      },
+      creditYears () {
+         return this.obj.years
+      },
+      initialPayment () {
+         return this.obj.initial
       }
    },
-   watch: {},
+   watch: {
+      creditYears () {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+      },
+      getProcent() {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+      },
+      getInitial () {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+      },
+      getLounAmount() {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+
+      }
+   },
    mounted() {
-      this.getPayments(this.getMonth, this.getLounAmount, this.getProcent).forEach((data) => this.createTableRow(data));
-      console.log(this.resultTableArray)
+      this.obj.initial = this.obj.price * 0.15
+      this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent)
    }
 }
 ;
