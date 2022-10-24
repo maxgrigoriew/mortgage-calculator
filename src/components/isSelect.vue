@@ -6,15 +6,13 @@
        :class="{open: open}"
    >
       <div
-          class="selected"
-          :class="{open: open}"
+          :class="`selected${open ? ' show' : ''}`"
           @click="open = !open"
       >
          <div class="selected__title"> {{ selected.name }}</div>
       </div>
       <div
           class="items"
-          :class="{selectHide: !open}"
       >
          <div
              class="item"
@@ -72,7 +70,7 @@ export default {
    right: 1em;
    width: 0;
    height: 0;
-   transition: 0.4s;
+   transition: all 0.4s;
    transform: rotate(0) translateY(0);
    transform-origin: top;
    border: 5px solid #53b374;
@@ -89,6 +87,13 @@ export default {
    padding-left: 8px;
    cursor: pointer;
    user-select: none;
+   &.show {
+      & ~ .items {
+         max-height: 250px;
+         transition: all .2s;
+         visibility: visible;
+      }
+   }
 }
 .selected.open {
    border-bottom-left-radius: 0;
@@ -113,9 +118,10 @@ export default {
    left: 0;
    right: 0;
    z-index: 10;
-   min-height: 100px;
-   max-height: 250px;
+   max-height: 0;
    overflow-y: scroll;
+   transition: all .2s;
+   visibility: hidden;
 }
 .item {
    padding: 0 10px;
@@ -138,9 +144,6 @@ export default {
          color: #fff;
       }
    }
-}
-.selectHide {
-   display: none;
 }
 
 </style>
