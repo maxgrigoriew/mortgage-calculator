@@ -159,10 +159,10 @@
          </template>
          </tbody>
       </table>
-      <!--      <is-modal :visibleModal="visibleModal"-->
-      <!--                @visibleModal="closeModal"-->
-      <!--                :resultTableArray="resultTableArray"-->
-      <!--      />-->
+            <is-modal :visibleModal="visibleModal"
+                      @visibleModal="closeModal"
+                      :resultTableArray="resultTableArray"
+            />
    </div>
 </template>
 
