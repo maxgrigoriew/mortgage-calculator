@@ -15,27 +15,17 @@
                                    @option="selectChange"
                         />
                      </div>
+
                      <div class="checkbox col-12">
                         <div class="checkbox__inner">
                            <span class="checkbox__title">Есть зарплатная карта</span>
-                           <div class="checkbox__wrapper">
+                           <span class="checkbox__wrapper">
                               <span class="checkbox__procent"
-                                    :class="{active: checked}"
-                              >
-                                 -1%
-                              </span>
-                              <label class="switch" for="checkbox">
-                                 <input type="checkbox"
-                                        v-model="checked"
-                                        value="test"
-                                 />
-                                 <div class="slider round"
-                                      @click="checked = !checked"
-                                 >
-
-                                 </div>
-                              </label>
-                           </div>
+                                    :class="{'active': checked}">
+                              - {{obj.procentCard}} %
+                           </span>
+                              <is-checkbox v-model="checked" :procentCard="obj.procentCard"/>
+                           </span>
                         </div>
                      </div>
 
@@ -48,6 +38,8 @@
                               <input type="text"
                                      class="range__inner-text"
                                      v-model.trim.number="obj.price"
+                                     @keypress="validateNumber"
+
                               >
                               <div class="range__inner-icon">₽</div>
                            </div>
@@ -59,9 +51,8 @@
                            >
                         </div>
                      </div>
-
                      <div class="range col-12">
-                        <div class="range__title" style="font-weight: 900;">
+                        <div class="range__title">
                            Первоначальный взнос <br>
                            <span style="font-size: 10px;">Первоначальный взнос должен быть не более 90% от стоимости недвижимости</span>
                         </div>
@@ -70,6 +61,8 @@
                               <input type="text"
                                      class="range__inner-text"
                                      v-model.trim.number="obj.initial"
+                                     @keypress="validateNumber"
+
                               >
                               <span class="range__inner-icon">₽</span>
                            </div>
@@ -90,8 +83,9 @@
                               <input type="text"
                                      class="range__inner-text"
                                      v-model.trim.number="obj.years"
+                                     @keypress="validateNumber"
                               >
-                              <div class="range__inner-icon">лет</div>
+                              <div class="range__inner-icon">{{getyears}}</div>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -128,54 +122,32 @@
                         >График платежей
                         </button>
                      </div>
-                     <div class="info col-12">
-                        <button class="info__button">Оставить заявку</button>
-                     </div>
+<!--                     <div class="info col-12">-->
+<!--                        <button class="info__button">Оставить заявку</button>-->
+<!--                     </div>-->
                   </div>
                </div>
             </div>
          </div>
       </div>
-      <table>
-         <thead>
-         <tr>
-            <th>Месяц, год</th>
-            <th>Ежемесячный платеж</th>
-            <th>Сумма погашения процентов</th>
-            <th>Сумма погашения сновного долга</th>
-            <th>Остаток долга</th>
-         </tr>
-         </thead>
-         <tbody class="tableBody">
-         <template v-if="resultTableArray.length > 0">
-            <tr v-for="(pay, index) in resultTableArray"
-                :key="index"
-            >
-               <td>{{ pay.currMonth }}</td>
-               <td>{{ pay.monthlyPayment }} руб.</td>
-               <td>{{ pay.paymentInterest }} руб.</td>
-               <td>{{ pay.paymentRemain }} руб.</td>
-               <td>{{ pay.totalRemain }} руб.</td>
-            </tr>
-         </template>
-         </tbody>
-      </table>
-            <is-modal :visibleModal="visibleModal"
-                      @visibleModal="closeModal"
-                      :resultTableArray="resultTableArray"
-            />
+      <is-modal :visibleModal="visibleModal"
+                @visibleModal="closeModal"
+                :resultTableArray="resultTableArray"
+      />
    </div>
 </template>
 
 <script>
 import isSelect from '@/components/isSelect';
 import isModal from '@/components/isModal';
+import isCheckbox from '@/components/isCheckbox';
 
 export default {
    name: 'App',
    components: {
       isSelect,
-      isModal
+      isModal,
+      isCheckbox,
    },
    data() {
       return {
@@ -186,8 +158,8 @@ export default {
             years: 1,
             value: 0,
             procentCard: 1,
-            maxPrice: 6000000,
-            minPrice: 200000
+            maxPrice: 100000000,
+            minPrice: 200000,
          },
          options: [
             {name: 'Квартира на вторичном рынке', procent: 10, value: 2},
@@ -199,19 +171,25 @@ export default {
          ],
          checked: false,
          selected: '',
-         visibleModal: true,
-         resultTableArray: []
+         visibleModal: false,
+         resultTableArray: [],
       };
    },
    methods: {
+      validateNumber: event => {
+         let keyCode = event.keyCode;
+         if (keyCode < 48 || keyCode > 57) {
+            event.preventDefault();
+         }
+      },
       selectChange(value) {
-         this.selected = value
+         this.selected = value;
       },
       openModal() {
-         this.visibleModal = true
+         this.visibleModal = true;
       },
       closeModal() {
-         this.visibleModal = false
+         this.visibleModal = false;
       },
       getPayments(months, loanAmount, annualIntersetRate) {
          // Заведём переменную "месечная процентная ставка"
@@ -219,147 +197,127 @@ export default {
          // поделённой на кол-ву месяцев в году (12)
          // Например, если годовая ставка будет равна 10%,
          // то месечная ставка = 10/12/100 = 0.0083%
-         const monthlyRate = annualIntersetRate / 12 / 100
-         const commonRate = Math.pow(1 + monthlyRate, months)
-         const monthlyPayment = ((loanAmount * monthlyRate * commonRate) / (commonRate - 1)).toFixed(2)
+         const monthlyRate = annualIntersetRate / 12 / 100;
+         const commonRate = Math.pow(1 + monthlyRate, months);
+         const monthlyPayment = ((loanAmount * monthlyRate * commonRate) / (commonRate - 1)).toFixed(2);
          // Складируем все данные по месяцам сюда
-         const result = []
-         const today = new Date(Date.now())
+         const result = [];
+         const today = new Date(Date.now());
          for (let i = 0; i < months; i++) {
             // Переменная "totalRemain" будет отвечать за сумму,
             // которую осталось выплатить.
             // Изначально он будет равен сумме кредита.
-            const {totalRemain = loanAmount} = result[result.length - 1] || {}
-            const newDate = new Date(today.setMonth(today.getMonth() + 1))
-            const paymentInterest = (monthlyRate * totalRemain).toFixed(2)
-            const paymentRemain = (monthlyPayment - paymentInterest).toFixed(2)
+            const {totalRemain = loanAmount} = result[result.length - 1] || {};
+            const newDate = new Date(today.setMonth(today.getMonth() + 1));
+            const paymentInterest = (monthlyRate * totalRemain).toFixed(2);
+            const paymentRemain = (monthlyPayment - paymentInterest).toFixed(2);
             const currMonth = newDate.toLocaleString('ru', {
                year: 'numeric',
-               month: 'short'
-            })
+               month: 'short',
+            });
             result.push({
                totalRemain: (Math.max(totalRemain - paymentRemain, 0)).toFixed(2),
                monthlyPayment,
                paymentInterest,
                paymentRemain,
-               currMonth
+               currMonth,
             });
          }
-         this.resultTableArray = result
+         this.resultTableArray = result;
          return result;
       },
    },
    computed: {
       getProcent() {
          if (this.checked) {
-            return this.selected.procent - this.getSelectedProcent
+            return this.selected.procent - this.getSelectedProcent;
          } else {
-            return this.selected.procent
+            return this.selected.procent;
          }
       },
       monthlyRate() {
-         return this.getProcent / 100 / 12
+         return this.getProcent / 100 / 12;
       },
       getLounAmount() {
-         return this.obj.price - this.obj.initial
+         const n = parseInt(this.obj.price - this.obj.initial);
+         return n;
       },
       getInitial() {
-         return this.obj.initial
+         return this.obj.initial;
       },
       getMonth() {
-         return this.obj.years * 12
+         return this.obj.years * 12;
       },
       commonRate() {
-         return Math.pow(1 + this.monthlyRate, this.getMonth)
+         return Math.pow(1 + this.monthlyRate, this.getMonth);
       },
       monthlyPayment() {
-         let monthlyPay  = (this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1)
-         let monthlyAroundPayment = Math.floor(monthlyPay )
-         if (monthlyAroundPayment < 0) {
-            return false
-         }
-         return monthlyAroundPayment
+         let monthlyPay = (this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1);
+         let monthlyAroundPayment = Math.floor(monthlyPay);
+         return monthlyAroundPayment;
       },
       getSelectedProcent() {
-         return this.obj.procentCard
+         return this.obj.procentCard;
       },
       recomendetIncome() {
-         return (this.monthlyPayment / 100 * 35) + this.monthlyPayment
+         return Math.floor((this.monthlyPayment / 100 * 35) + this.monthlyPayment);
       },
-      creditYears () {
-         return this.obj.years
+      creditYears() {
+         return this.obj.years;
       },
-      initialPayment () {
-         return this.obj.initial
-      }
+      initialPayment() {
+         return this.obj.initial;
+      },
+      getyears() {
+         if (this.getMonth <= 12) {
+            return 'год'
+         }
+         if( this.getMonth <= 48) {
+            return 'года'
+         }
+         else {
+            return 'лет'
+         }
+      },
    },
    watch: {
-      creditYears () {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+      creditYears() {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
       },
       getProcent() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
       },
-      getInitial () {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
+      getInitial() {
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
       },
       getLounAmount() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected)
-
-      }
+         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
+      },
    },
    mounted() {
       this.obj.initial = this.obj.price * 0.15
       this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent)
    }
-}
-;
+};
 </script>
-
-<style lang="scss">
-
+<style scoped lang="scss">
 $green-color: #53b374;
-.switch input {
-   display: none;
-}
-.switch {
-   display: inline-block;
-   height: 26px;
-   position: relative;
-   width: 60px;
-}
-.slider {
-   bottom: 0;
-   cursor: pointer;
-   left: 0;
-   position: absolute;
-   right: 0;
-   top: 0;
-   transition: .4s;
-   border: 1px solid $green-color;
-}
-.slider:before {
-   background-color: #53b374;
-   bottom: 3px;
-   content: "";
-   width: 18px;
-   height: 18px;
-   left: 4px;
-   position: absolute;
-   transition: .4s;
-}
-input:checked + .slider {
-   background-color: #53b374;
-}
-input:checked + .slider:before {
-   transform: translateX(33px);
-   background: #fff;
-}
-.slider.round {
-   border-radius: 34px;
-}
-.slider.round:before {
-   border-radius: 50%;
-}
 
+.checkbox {
+   margin-bottom: 30px;
+   &__inner {
+      display: flex;
+      justify-content: space-between;
+   }
+   &__wrapper {
+      display: flex;
+      align-items: center;
+   }
+   &__procent {
+      padding-right: 30px;
+   }
+   &__procent.active {
+      color: $green-color;
+   }
+}
 </style>
