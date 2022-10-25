@@ -97,7 +97,7 @@ export default {
       transform: rotate(-45deg);
    }
    &__content {
-      max-height: 800px;
+      max-height: 750px;
       overflow-y: scroll;
    }
 }
