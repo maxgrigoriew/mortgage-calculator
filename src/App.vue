@@ -15,20 +15,20 @@
                                    @option="selectChange"
                         />
                      </div>
-
+                     
                      <div class="checkbox col-12">
                         <div class="checkbox__inner">
                            <span class="checkbox__title">Есть зарплатная карта</span>
                            <span class="checkbox__wrapper">
                               <span class="checkbox__procent"
                                     :class="{'active': checked}">
-                              - {{obj.procentCard}} %
+                              - {{ obj.procentCard }} %
                            </span>
                               <is-checkbox v-model="checked" :procentCard="obj.procentCard"/>
                            </span>
                         </div>
                      </div>
-
+                     
                      <div class="range col-12">
                         <div class="range__title">
                            Стоимость недвижимости
@@ -38,7 +38,7 @@
                               <input type="text"
                                      class="range__inner-text"
                                      v-model.trim.number="obj.price"
-                                     @keypress="validateNumber"
+                                     @keypress="validateNumber(obj.price)"
                               >
                               <div class="range__inner-icon">₽</div>
                            </div>
@@ -85,7 +85,7 @@
                                      v-model.trim.number="obj.years"
                                      @keypress="validateNumber"
                               >
-                              <div class="range__inner-icon">{{getYears}}</div>
+                              <div class="range__inner-icon">{{ getYears }}</div>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -115,16 +115,16 @@
                         <span class="info__title">Рекомендованный доход</span>
                         <span class="info__price">{{ recomendetIncome }} ₽</span>
                      </div>
-
+                     
                      <div class="info col-12">
                         <button class="info__button info__button--light"
                                 @click="openModal"
                         >График платежей
                         </button>
                      </div>
-<!--                     <div class="info col-12">-->
-<!--                        <button class="info__button">Оставить заявку</button>-->
-<!--                     </div>-->
+                     <!--                     <div class="info col-12">-->
+                     <!--                        <button class="info__button">Оставить заявку</button>-->
+                     <!--                     </div>-->
                   </div>
                </div>
             </div>
@@ -179,7 +179,8 @@ export default {
       printTable() {
          window.print()
       },
-      validateNumber(){
+      validateNumber(event) {
+         console.log(length)
          let keyCode = event.keyCode;
          if (keyCode < 48 || keyCode > 57) {
             event.preventDefault();
@@ -233,7 +234,7 @@ export default {
    computed: {
       getProcent() {
          if (this.checked) {
-            return this.selected.procent - this.getSelectedProcent;
+            return (this.selected.procent - this.getSelectedProcent).toFixed(1);
          } else {
             return this.selected.procent;
          }
@@ -257,7 +258,7 @@ export default {
          return Math.pow(1 + this.monthlyRate, this.getMonth);
       },
       monthlyPayment() {
-        return  Math.floor((this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1)) ;
+         return Math.floor((this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1));
       },
       getSelectedProcent() {
          return this.obj.procentCard;
@@ -275,10 +276,9 @@ export default {
          if (this.getMonth <= 12) {
             return 'год'
          }
-         if( this.getMonth <= 48) {
+         if (this.getMonth <= 48) {
             return 'года'
-         }
-         else {
+         } else {
             return 'лет'
          }
       },
@@ -298,7 +298,7 @@ export default {
       },
       getPrice() {
          if (this.obj.price < this.obj.initial) {
-           this.obj.initial =  Math.floor(this.obj.price * 0.9)
+            this.obj.initial = Math.floor(this.obj.price * 0.9)
          } else {
             this.obj.initial = Math.floor(this.obj.price * 0.15)
          }
@@ -311,7 +311,6 @@ export default {
 </script>
 <style scoped lang="scss">
 $green-color: #53b374;
-
 .checkbox {
    margin-bottom: 30px;
    &__inner {

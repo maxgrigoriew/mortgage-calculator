@@ -80,6 +80,9 @@ body {
 	font-weight: 500;
 	position: relative;
   }
+  &__inner-top.active {
+    border: 1px solid red;
+  }
   &__inner-text {
 	padding: 0 20px 0 10px;
 	background: transparent;
