@@ -39,7 +39,6 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.price"
                                      @keypress="validateNumber"
-
                               >
                               <div class="range__inner-icon">₽</div>
                            </div>
@@ -54,7 +53,9 @@
                      <div class="range col-12">
                         <div class="range__title">
                            Первоначальный взнос <br>
-                           <span style="font-size: 10px;">Первоначальный взнос должен быть не более 90% от стоимости недвижимости</span>
+                           <span class="range__subtitle">
+                              Первоначальный взнос должен быть не менее <strong>15%</strong> и не более <strong>90% </strong>от стоимости недвижимости
+                           </span>
                         </div>
                         <div class="range__inner">
                            <div class="range__inner-top">
@@ -62,7 +63,6 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.initial"
                                      @keypress="validateNumber"
-
                               >
                               <span class="range__inner-icon">₽</span>
                            </div>
@@ -85,7 +85,7 @@
                                      v-model.trim.number="obj.years"
                                      @keypress="validateNumber"
                               >
-                              <div class="range__inner-icon">{{getyears}}</div>
+                              <div class="range__inner-icon">{{getYears}}</div>
                            </div>
                            <input class="range__inner-input"
                                   type="range"
@@ -133,6 +133,7 @@
       <is-modal :visibleModal="visibleModal"
                 @visibleModal="closeModal"
                 :resultTableArray="resultTableArray"
+                @click="printTable"
       />
    </div>
 </template>
@@ -153,13 +154,12 @@ export default {
       return {
          years: 1,
          obj: {
-            price: 200000,
-            initial: null,
+            price: 1000000,
+            initial: 150000,
             years: 1,
-            value: 0,
             procentCard: 1,
             maxPrice: 100000000,
-            minPrice: 200000,
+            minPrice: 1000000,
          },
          options: [
             {name: 'Квартира на вторичном рынке', procent: 10, value: 2},
@@ -176,7 +176,10 @@ export default {
       };
    },
    methods: {
-      validateNumber: event => {
+      printTable() {
+         window.print()
+      },
+      validateNumber(){
          let keyCode = event.keyCode;
          if (keyCode < 48 || keyCode > 57) {
             event.preventDefault();
@@ -199,7 +202,7 @@ export default {
          // то месечная ставка = 10/12/100 = 0.0083%
          const monthlyRate = annualIntersetRate / 12 / 100;
          const commonRate = Math.pow(1 + monthlyRate, months);
-         const monthlyPayment = ((loanAmount * monthlyRate * commonRate) / (commonRate - 1)).toFixed(2);
+         const monthlyPayment = Math.floor((loanAmount * monthlyRate * commonRate) / (commonRate - 1));
          // Складируем все данные по месяцам сюда
          const result = [];
          const today = new Date(Date.now());
@@ -209,14 +212,14 @@ export default {
             // Изначально он будет равен сумме кредита.
             const {totalRemain = loanAmount} = result[result.length - 1] || {};
             const newDate = new Date(today.setMonth(today.getMonth() + 1));
-            const paymentInterest = (monthlyRate * totalRemain).toFixed(2);
-            const paymentRemain = (monthlyPayment - paymentInterest).toFixed(2);
+            const paymentInterest = (monthlyRate * totalRemain).toFixed();
+            const paymentRemain = (monthlyPayment - paymentInterest).toFixed();
             const currMonth = newDate.toLocaleString('ru', {
                year: 'numeric',
                month: 'short',
             });
             result.push({
-               totalRemain: (Math.max(totalRemain - paymentRemain, 0)).toFixed(2),
+               totalRemain: (Math.max(totalRemain - paymentRemain, 0)).toFixed(),
                monthlyPayment,
                paymentInterest,
                paymentRemain,
@@ -239,11 +242,13 @@ export default {
          return this.getProcent / 100 / 12;
       },
       getLounAmount() {
-         const n = parseInt(this.obj.price - this.obj.initial);
-         return n;
+         return Math.floor(this.obj.price - this.obj.initial);
       },
       getInitial() {
-         return this.obj.initial;
+         return Math.floor(this.obj.initial)
+      },
+      getPrice() {
+         return Math.floor(this.obj.price)
       },
       getMonth() {
          return this.obj.years * 12;
@@ -252,9 +257,7 @@ export default {
          return Math.pow(1 + this.monthlyRate, this.getMonth);
       },
       monthlyPayment() {
-         let monthlyPay = (this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1);
-         let monthlyAroundPayment = Math.floor(monthlyPay);
-         return monthlyAroundPayment;
+        return  Math.floor((this.getLounAmount * this.monthlyRate * this.commonRate) / (this.commonRate - 1)) ;
       },
       getSelectedProcent() {
          return this.obj.procentCard;
@@ -266,9 +269,9 @@ export default {
          return this.obj.years;
       },
       initialPayment() {
-         return this.obj.initial;
+         return this.obj.initial.toFixed(2);
       },
-      getyears() {
+      getYears() {
          if (this.getMonth <= 12) {
             return 'год'
          }
@@ -282,21 +285,27 @@ export default {
    },
    watch: {
       creditYears() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
+         this.getPayments(this.getMonth, this.getLounAmount, this.getProcent, this.selected);
       },
       getProcent() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
+         this.getPayments(this.getMonth, this.getLounAmount, this.getProcent, this.selected);
       },
       getInitial() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
+         this.getPayments(this.getMonth, this.getLounAmount, this.getProcent, this.selected);
       },
       getLounAmount() {
-         this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent, this.selected);
+         this.getPayments(this.getMonth, this.getLounAmount, this.getProcent, this.selected);
       },
+      getPrice() {
+         if (this.obj.price < this.obj.initial) {
+           this.obj.initial =  Math.floor(this.obj.price * 0.9)
+         } else {
+            this.obj.initial = Math.floor(this.obj.price * 0.15)
+         }
+      }
    },
    mounted() {
-      this.obj.initial = this.obj.price * 0.15
-      this.getPayments(this.obj.years * 12, this.getLounAmount, this.getProcent)
+      this.getPayments(this.getMonth, this.getLounAmount, this.getProcent)
    }
 };
 </script>

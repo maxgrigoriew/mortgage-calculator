@@ -9,8 +9,8 @@
                <button class="dialog__btn"
                        @click="hideDialog"
                >
-
                </button>
+               <button @click="$emit('click')">Печать</button>
             </div>
             <div class="dialog__content">
                <is-table-header :resultTableArray="resultTableArray"/>

@@ -49,6 +49,14 @@ body {
   position: relative;
   &__title {
 	margin-bottom: 28px;
+    position: relative;
+  }
+  &__subtitle {
+    position: absolute;
+    font-size: 11px;
+    & strong {
+      color: $green-color;
+    }
   }
   &__inner {
 	padding-bottom: 30px;
@@ -206,4 +214,12 @@ td {
 }
 tr:nth-child(even) {
   background: #eee;
+}
+@media print {
+  button {
+    display: none;
+  }
+  .dialog__content {
+    overflow-y: auto;
+  }
 }
