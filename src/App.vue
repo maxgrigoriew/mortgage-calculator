@@ -38,7 +38,8 @@
                               <input type="text"
                                      class="range__inner-text"
                                      v-model.trim.number="obj.price"
-                                     @keypress="validateNumber(obj.price)"
+                                     @keypress="validateNumber"
+                                     :maxlength="limitPrice"
                               >
                               <div class="range__inner-icon">₽</div>
                            </div>
@@ -63,6 +64,7 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.initial"
                                      @keypress="validateNumber"
+                                     :maxlength="limitPrice"
                               >
                               <span class="range__inner-icon">₽</span>
                            </div>
@@ -84,6 +86,7 @@
                                      class="range__inner-text"
                                      v-model.trim.number="obj.years"
                                      @keypress="validateNumber"
+                                     :maxlength="limitYears"
                               >
                               <div class="range__inner-icon">{{ getYears }}</div>
                            </div>
@@ -173,17 +176,23 @@ export default {
          selected: '',
          visibleModal: false,
          resultTableArray: [],
+         limitPrice: 9,
+         limitYears: 2,
       };
    },
    methods: {
       printTable() {
          window.print()
       },
-      validateNumber(event) {
-         console.log(length)
+      validateNumber(event, value) {
+         const valueLength = (value + '').length
+         console.log(valueLength);
          let keyCode = event.keyCode;
          if (keyCode < 48 || keyCode > 57) {
             event.preventDefault();
+         }
+         if(valueLength > 9) {
+            console.log('error');
          }
       },
       selectChange(value) {
