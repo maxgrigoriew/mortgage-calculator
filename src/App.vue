@@ -122,12 +122,10 @@
                      <div class="info col-12">
                         <button class="info__button info__button--light"
                                 @click="openModal"
-                        >График платежей
+                        >
+                           График платежей
                         </button>
                      </div>
-                     <!--                     <div class="info col-12">-->
-                     <!--                        <button class="info__button">Оставить заявку</button>-->
-                     <!--                     </div>-->
                   </div>
                </div>
             </div>
@@ -136,8 +134,16 @@
       <is-modal :visibleModal="visibleModal"
                 @visibleModal="closeModal"
                 :resultTableArray="resultTableArray"
-                @click="printTable"
-      />
+      >
+         <h3 slot="title">График платежей</h3>
+         <is-table-header slot="content" :resultTableArray="resultTableArray"/>
+         <div class="d-flex justify-content-end mt-3">
+            <button class="info__button info__button--light"
+                    @click="printTable">
+               Печать
+            </button>
+         </div>
+      </is-modal>
    </div>
 </template>
 
@@ -145,6 +151,7 @@
 import isSelect from '@/components/isSelect';
 import isModal from '@/components/isModal';
 import isCheckbox from '@/components/isCheckbox';
+import IsTableHeader from '@/components/isTableHeader';
 
 export default {
    name: 'App',
@@ -152,6 +159,7 @@ export default {
       isSelect,
       isModal,
       isCheckbox,
+      IsTableHeader
    },
    data() {
       return {
@@ -191,7 +199,7 @@ export default {
          if (keyCode < 48 || keyCode > 57) {
             event.preventDefault();
          }
-         if(valueLength > 9) {
+         if (valueLength > 9) {
             console.log('error');
          }
       },
@@ -205,11 +213,6 @@ export default {
          this.visibleModal = false;
       },
       getPayments(months, loanAmount, annualIntersetRate) {
-         // Заведём переменную "месечная процентная ставка"
-         // она будет равна "годовая процентной ставке" (annualIntersetRate)
-         // поделённой на кол-ву месяцев в году (12)
-         // Например, если годовая ставка будет равна 10%,
-         // то месечная ставка = 10/12/100 = 0.0083%
          const monthlyRate = annualIntersetRate / 12 / 100;
          const commonRate = Math.pow(1 + monthlyRate, months);
          const monthlyPayment = Math.floor((loanAmount * monthlyRate * commonRate) / (commonRate - 1));

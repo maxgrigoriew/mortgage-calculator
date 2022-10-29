@@ -5,15 +5,14 @@
            class="dialog">
          <div @click.stop class="dialog__inner">
             <div class="dialog__top">
-               <h3 class="dialog__title">График платежей</h3>
+               <slot name="title" class="dialog__title"/>
                <button class="dialog__btn"
                        @click="hideDialog"
                >
                </button>
-               <button @click="$emit('click')">Печать</button>
             </div>
             <div class="dialog__content">
-               <is-table-header :resultTableArray="resultTableArray"/>
+               <slot name="content"/>
             </div>
             <slot></slot>
          </div>
@@ -22,11 +21,9 @@
 </template>
 
 <script>
-import IsTableHeader from '@/components/isTableHeader';
 
 export default {
    name: 'isModal',
-   components: {IsTableHeader},
    props: {
       visibleModal: {
          type: Boolean,
@@ -97,7 +94,7 @@ export default {
       transform: rotate(-45deg);
    }
    &__content {
-      max-height: 750px;
+      max-height: 700px;
       overflow-y: scroll;
    }
 }
