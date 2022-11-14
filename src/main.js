@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-// import './assets/scss/main.scss'
+import './assets/scss/main.scss'
 import vuetify from './plugins/vuetify'
 import isSelect from '@/components/isSelect';
 import isCheckbox from '@/components/isCheckbox';
