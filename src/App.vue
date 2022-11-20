@@ -21,18 +21,25 @@
                    value="red"
                    hide-details
                />
+<!--               field 1                     -->
                <v-text-field
                    label="Введите сумму кредита"
-                   v-model="object.price"
+                   v-model="object.creditPrice"
                />
                <v-slider
-                   hint="Im a hint"
-                   :min="object.price * 0.15"
-                   :max="object.price * 0.9"
-                   thumb-label="always"
-                   v-model="object.price"
+                   v-model="object.creditPrice"
+                   :max="object.maxPrice"
+                   :min="object.minPrice"
                />
-               <div>{{object.price}}</div>
+<!--               field 2                     -->
+               <v-text-field
+                   v-model="object.initial"
+               />
+               <v-slider
+                   v-model="object.initial"
+                   :min="object.creditPrice * 0.15"
+                   :max="object.creditPrice * 0.9"
+               />
             </v-col>
             <v-col
             
@@ -40,11 +47,11 @@
             <v-row>
                <v-col>
                  <p>Сумма кредита</p>
-                 <p>{{getPrice}}</p>
+                 <p>{{object.creditPrice}}</p>
                </v-col>
                <v-col>
                   <p>Сумма первоначального взноса</p>
-                  <p>{{getInitial}}</p>
+                  <p>{{object.initial}}</p>
                </v-col>
             </v-row>
             </v-col>
@@ -63,8 +70,10 @@ export default {
    
    data: () => ({
       object: {
-         price: 1000000,
+         creditPrice: 1000000,
          initial: 150000,
+         minPrice: 1000,
+         maxPrice: 100000
       },
       checkbox: false,
       defaultOption: {name: 'Квартира на вторичном рынке', procent: 10, value: 2},
@@ -77,14 +86,23 @@ export default {
          {name: 'Наличные подо залог жилья', procent: 10.9, value: 6},
       ],
    }),
+   methods: {
+   },
    computed: {
       getPrice() {
-         return this.object.price
+         return this.object.creditPrice
       },
-      getInitial() {
-         return this.object.price - this.object.initial
-      }
-   }
+      // getInitial() {
+      //    return this.object.price - this.object.initial
+      // }
+   },
+   watch: {
+      // handler() {
+      //    console.log('sd')
+      //    return this.object.price
+      // },
+      // deep: true
+   },
 };
 </script>
 <style lang="scss">
